@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_ui_page">
+    <sys_ui_page action="INSERT_OR_UPDATE">
+        <category>general</category>
+        <client_script><![CDATA[var app = angular.module("myApp", []);
+app.controller("myCtrl", function($scope) {
+    var c = this;
+	c.desc = "Des";
+	console.log('1');
+	$scope.ajx = function (){
+		console.log('2');
+		var ga = new GlideAjax('x_184981_ajaxcrud.ajaxCrud');
+		ga.addParam('sysparm_name', 'createInc');
+		ga.addParam('sysparm_desc', c.desc);
+		ga.getXML(ajaxResponse);
+		console.log('3');
+		
+		function ajaxResponse(serverResponse) { 
+			console.log(serverResponse);
+		}
+	};
+});]]></client_script>
+        <description/>
+        <direct>false</direct>
+        <endpoint>x_184981_ajaxcrud_index.do</endpoint>
+        <html><![CDATA[<?xml version="1.0" encoding="utf-8" ?>
+<j:jelly trim="false" xmlns:j="jelly:core" xmlns:g="glide" xmlns:j2="null" xmlns:g2="null">
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+	<div ng-app="myApp" ng-controller="myCtrl"> 
+		<input type="text" id="short" ng-model="desc"></input>
+		<button ng-click="ajx()">Perro</button>
+		<p>{{desc}}</p>
+	</div>
+</j:jelly>]]></html>
+        <name>index</name>
+        <processing_script/>
+        <sys_class_name>sys_ui_page</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-05-11 17:46:15</sys_created_on>
+        <sys_id>b7c81949db0213009b43aab35b9619a9</sys_id>
+        <sys_mod_count>24</sys_mod_count>
+        <sys_name>index</sys_name>
+        <sys_package display_value="ajaxCRUD" source="x_184981_ajaxcrud">90a85149db0213009b43aab35b9619b2</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="ajaxCRUD">90a85149db0213009b43aab35b9619b2</sys_scope>
+        <sys_update_name>sys_ui_page_b7c81949db0213009b43aab35b9619a9</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-05-11 18:38:23</sys_updated_on>
+    </sys_ui_page>
+</record_update>
