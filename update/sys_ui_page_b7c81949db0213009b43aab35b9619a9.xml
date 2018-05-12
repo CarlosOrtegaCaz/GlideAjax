@@ -4,21 +4,53 @@
         <category>general</category>
         <client_script><![CDATA[var app = angular.module("myApp", []);
 app.controller("myCtrl", function($scope) {
-    var c = this;
-	c.desc = "Des";
-	console.log('1');
-	$scope.ajx = function (){
-		console.log('2');
+	$scope.desc = "";
+
+	$scope.sr = function (number, desc){
+		$scope.selecRec = number;
+		$scope.selecSh = desc;
+	};
+	$scope.insert = function (){
+		console.log('inserta');
 		var ga = new GlideAjax('x_184981_ajaxcrud.ajaxCrud');
 		ga.addParam('sysparm_name', 'createInc');
-		ga.addParam('sysparm_desc', c.desc);
+		ga.addParam('sysparm_desc', $scope.desc);
 		ga.getXML(ajaxResponse);
-		console.log('3');
 		
 		function ajaxResponse(serverResponse) { 
 			console.log(serverResponse);
 		}
 	};
+	$scope.deleteRecord = function (){
+		console.log('delete');
+		var ga = new GlideAjax('x_184981_ajaxcrud.ajaxCrud');
+		ga.addParam('sysparm_name', 'deleteInc');
+		ga.addParam('sysparm_number', $scope.selecRec);
+		ga.getXML(ajaxResponse);
+		
+		function ajaxResponse(serverResponse) { 
+			console.log( serverResponse.responseXML.documentElement.getAttribute("answer"));
+		}
+	};
+		$scope.edit = function (){
+		var ga = new GlideAjax('x_184981_ajaxcrud.ajaxCrud');
+		ga.addParam('sysparm_name', 'editInc');
+		ga.addParam('sysparm_number', $scope.selecRec);
+		ga.addParam('sysparm_desc', $scope.selecSh);
+		ga.getXML(ajaxResponse);		
+		function ajaxResponse(serverResponse) { 
+			console.log(serverResponse);
+		}
+	};
+	$scope.readRecords = function (){
+		console.log('read');
+		var ga = new GlideAjax('x_184981_ajaxcrud.ajaxCrud');
+		ga.addParam('sysparm_name', 'readInc');
+		ga.getXMLWait();
+		$scope.records = JSON.parse(ga.getAnswer());
+		
+	};
+
 });]]></client_script>
         <description/>
         <direct>false</direct>
@@ -26,10 +58,103 @@ app.controller("myCtrl", function($scope) {
         <html><![CDATA[<?xml version="1.0" encoding="utf-8" ?>
 <j:jelly trim="false" xmlns:j="jelly:core" xmlns:g="glide" xmlns:j2="null" xmlns:g2="null">
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
-	<div ng-app="myApp" ng-controller="myCtrl"> 
-		<input type="text" id="short" ng-model="desc"></input>
-		<button ng-click="ajx()">Perro</button>
-		<p>{{desc}}</p>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"></link>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<div ng-app="myApp" ng-controller="myCtrl" ng-init="readRecords()"> 
+		
+		
+		<div class="container">
+		<button class="btn btn-primary" data-toggle="modal" data-target="#modalInsert">Nuevo</button>
+		<table class="table-hover table">
+			<tr>
+				<th>Number</th>
+				<th>Short Description</th>
+				<th>Edit</th>
+				<th>Delete</th>
+			</tr>
+			<tr ng-repeat="r in records track by $index" ng-click="sr(r.number, r.short)">
+				<td>{{r.number}}</td>
+				<td>{{r.short}}</td>
+				<td><button class="btn btn-warning" data-toggle="modal" data-target="#modalEdit">Edit</button></td>
+				<td><button class="btn btn-danger" data-toggle="modal" data-target="#modalDelete">Delete</button></td>
+			</tr>
+		</table>
+		</div>
+		
+<div id="modalEdit" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">X</button>
+        <h4 class="modal-title">Edit Record</h4>
+      </div>
+      <div class="modal-body">
+        <p>What do you want edit?.</p>
+		  <table class="table">
+			  <tr>
+				  <th>
+					  Short Description
+				  </th>
+			  </tr>
+			  <tr>
+				  <td>
+				  <input type="text" ng-model="selecSh" value="{{selecSh}}"></input>
+				  </td>
+			  </tr>
+			  
+		  </table>
+      </div>
+      <div class="modal-footer">
+		 <button type="button" class="btn btn-warning" ng-click="edit()" data-dismiss="modal">Edit</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+				
+<div id="modalDelete" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">X</button>
+        <h4 class="modal-title">Delete Record</h4>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure to DELETE record: {{selecRec}}?.</p>
+      </div>
+      <div class="modal-footer">
+		  <button type="button" class="btn btn-danger" ng-click="deleteRecord()" data-dismiss="modal">Delete</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="modalInsert" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">X</button>
+        <h4 class="modal-title">Insert Record</h4>
+      </div>
+      <div class="modal-body">
+        <p>Fill the field</p>
+		  <p class="col-md-4">Short Description</p>
+		  <input type="text" id="short" ng-model="desc"></input>
+      </div>
+      <div class="modal-footer">
+		  <button type="button" class="btn btn-primary" ng-click="insert()" data-dismiss="modal">Create</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 	</div>
 </j:jelly>]]></html>
         <name>index</name>
@@ -38,13 +163,13 @@ app.controller("myCtrl", function($scope) {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2018-05-11 17:46:15</sys_created_on>
         <sys_id>b7c81949db0213009b43aab35b9619a9</sys_id>
-        <sys_mod_count>24</sys_mod_count>
+        <sys_mod_count>92</sys_mod_count>
         <sys_name>index</sys_name>
         <sys_package display_value="ajaxCRUD" source="x_184981_ajaxcrud">90a85149db0213009b43aab35b9619b2</sys_package>
         <sys_policy/>
         <sys_scope display_value="ajaxCRUD">90a85149db0213009b43aab35b9619b2</sys_scope>
         <sys_update_name>sys_ui_page_b7c81949db0213009b43aab35b9619a9</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2018-05-11 18:38:23</sys_updated_on>
+        <sys_updated_on>2018-05-12 19:59:40</sys_updated_on>
     </sys_ui_page>
 </record_update>

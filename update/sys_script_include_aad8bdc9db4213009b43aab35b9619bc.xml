@@ -9,13 +9,43 @@
         <name>ajaxCrud</name>
         <script><![CDATA[var ajaxCrud = Class.create();
 ajaxCrud.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
-		createInc: function() {
-		var gr = new GlideRecord('inidents');
-		gr.initialize(); 
-		gr.name = 'New Incident'; 
-		gr.description = this.getParameter('sysparm_desc'); 
-		gr.insert();
-		console.log('perro');
+	createInc: function() {
+			var gr = new GlideRecord('incident');
+			gr.initialize(); 
+			gr.name = 'New Incident'; 
+			gr.short_description = this.getParameter('sysparm_desc') ; 
+			gr.insert();
+			return JSON.stringify({ert: gr});
+    },
+	deleteInc: function() {
+			var gr = new GlideRecord('incident');
+			gr.addQuery('number',this.getParameter('sysparm_number'));
+			gr.query();
+			while(gr.next()){
+gr.deleteRecord();
+    }
+				return 'Debio morir';
+
+    },
+	editInc: function() {
+			var gr = new GlideRecord('incident');
+			gr.addQuery('number',this.getParameter('sysparm_number'));
+			gr.query();
+			gr.next();
+			gr.short_description = this.getParameter('sysparm_desc');
+			gr.update();
+    },
+		readInc: function() {
+			var records = [];
+			var gr = new GlideRecord('incident');
+			gr.orderByDesc('sys_created_on');
+			gr.chooseWindow(0, 5);
+			gr.query();
+			while(gr.next()) { 				
+			  records.push({'number' : gr.getDisplayValue('number'), 'short' : gr.getDisplayValue('short_description')}); 
+			}
+			return JSON.stringify(records);
+
     },
 
     type: 'ajaxCrud'
@@ -24,13 +54,13 @@ ajaxCrud.prototype = Object.extendsObject(global.AbstractAjaxProcessor, {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2018-05-11 19:52:47</sys_created_on>
         <sys_id>aad8bdc9db4213009b43aab35b9619bc</sys_id>
-        <sys_mod_count>0</sys_mod_count>
+        <sys_mod_count>35</sys_mod_count>
         <sys_name>ajaxCrud</sys_name>
         <sys_package display_value="ajaxCRUD" source="x_184981_ajaxcrud">90a85149db0213009b43aab35b9619b2</sys_package>
         <sys_policy>read</sys_policy>
         <sys_scope display_value="ajaxCRUD">90a85149db0213009b43aab35b9619b2</sys_scope>
         <sys_update_name>sys_script_include_aad8bdc9db4213009b43aab35b9619bc</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2018-05-11 19:52:47</sys_updated_on>
+        <sys_updated_on>2018-05-12 19:12:19</sys_updated_on>
     </sys_script_include>
 </record_update>
